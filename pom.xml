@@ -10,6 +10,7 @@
     <modules>
         <module>netty-base</module>
         <module>netty-tcp</module>
+        <module>netty-util</module>
     </modules>
     <name>netty</name>
     <!-- FIXME change it to the project's website -->
@@ -22,9 +23,15 @@
         <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
         <junit.version>4.12</junit.version>
         <netty.version>4.1.30.Final</netty.version>
+        <netty.self.version>1.0</netty.self.version>
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>cn.mldn</groupId>
+                <artifactId>netty-util</artifactId>
+                <version>${netty.self.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
