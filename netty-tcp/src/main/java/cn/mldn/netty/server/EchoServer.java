@@ -9,6 +9,11 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.FixedLengthFrameDecoder;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.CharsetUtil;
 
 public class EchoServer {
     private int port;    // 服务器运行端口
@@ -41,11 +46,15 @@ public class EchoServer {
              * 或者其对应的ChannelPipeline来实现你的网络程序。 当你的程序变的复杂时，可能你会增加更多的处理类到pipline上，然后提取这些匿名类到最顶层的类上。
              */
             serverBootstrap = serverBootstrap.childHandler(
-                    // ChannelInitializer覆写了channelRegistered以及inboundBufferUpdated两个方法，
+                    // ChannelInitializer：它覆写了channelRegistered以及inboundBufferUpdated两个方法，
                     // 另外定义了一个抽象方法initChannel留给用户定义的类来实现
                     new ChannelInitializer<SocketChannel>() { // 如果不设置则无法设置子线程
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
+                            ch.pipeline().addLast(new FixedLengthFrameDecoder(50)) ; // 每一个数据占50个字节
+                            ch.pipeline().addLast(new LineBasedFrameDecoder(1024)) ;
+                            ch.pipeline().addLast(new StringEncoder(CharsetUtil.UTF_8)) ;
+                            ch.pipeline().addLast(new StringDecoder(CharsetUtil.UTF_8)) ;
                             ch.pipeline().addLast(new EchoServerHandler()); // 追加责任链
                         }
                     });

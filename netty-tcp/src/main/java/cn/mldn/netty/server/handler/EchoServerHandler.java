@@ -1,11 +1,7 @@
 package cn.mldn.netty.server.handler;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.CharsetUtil;
-import io.netty.util.ReferenceCountUtil;
 
 /**
  * 服务端处理通道.这里只是打印一下请求的内容，并不对请求进行任何的响应 DiscardServerHandler 继承自
@@ -13,13 +9,6 @@ import io.netty.util.ReferenceCountUtil;
  * 然后你可以覆盖这些方法。 现在仅仅只需要继承ChannelHandlerAdapter类而不是你自己去实现接口方法。
  */
 public class EchoServerHandler extends ChannelInboundHandlerAdapter {
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        byte data[] = "【服务器端】连接通道已建立，服务器端开始响应！".getBytes(); // 要发送头部消息
-        ByteBuf message = Unpooled.buffer(data.length);
-        message.writeBytes(data); // 将数据写入到缓存之中
-        ctx.writeAndFlush(message); // 写入数据
-    }
 
     /**
      * 这里我们覆盖了chanelRead()事件处理方法。 每当从客户端收到新的数据时， 这个方法会在收到消息时被调用，这个例子中，收到的消息的类型是ByteBuf
@@ -28,23 +17,10 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        try {
-            ByteBuf in = (ByteBuf) msg;
-            String inputStr = in.toString(CharsetUtil.UTF_8) ; // 获取用户输入数据
-            // System.out.println("【服务器端】" + in.toString(CharsetUtil.UTF_8));	// 打印客户端输入，传输过来的的字符
-            String echoContent = "〖ECHO〗" + inputStr ;
-            if ("exit".equalsIgnoreCase(inputStr)) {	// 客户端输入完毕关闭通道
-                echoContent = "quit" ; // 服务端设置的结束命令
-            }
-            byte [] data = echoContent.getBytes() ;
-            ByteBuf newBuf = Unpooled.buffer(data.length) ;
-            newBuf.writeBytes(data) ;	// 进行消息输出
-            ctx.writeAndFlush(newBuf) ; // 将接收到的消息发送到服务器端
-        } finally {
-            // ByteBuf是一个引用计数对象，这个对象必须显示地调用release()方法来释放。
-            // 请记住处理器的职责是释放所有传递到处理器的引用计数对象。
-            ReferenceCountUtil.release(msg); // 抛弃收到的数据
-        }
+        String inputStr = (String) msg ; // 2、得到用户发送的数据
+        System.err.println("｛服务器｝" + inputStr);
+        String echoContent = "【ECHO】" + inputStr + System.getProperty("line.separator") ; // 3、回应的消息内容
+        ctx.writeAndFlush(echoContent) ;
     }
     /***
      * 这个方法会在发生异常时触发
