@@ -9,11 +9,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.FixedLengthFrameDecoder;
-import io.netty.handler.codec.LineBasedFrameDecoder;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
-import io.netty.util.CharsetUtil;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 
 public class EchoClient {
     private String hostname;
@@ -31,10 +29,8 @@ public class EchoClient {
                     .handler(new ChannelInitializer<SocketChannel>() { // 如果不设置则无法设置子线程
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new FixedLengthFrameDecoder(50)) ; // 每一个数据占50个字节
-                            ch.pipeline().addLast(new LineBasedFrameDecoder(1024)) ;
-                            ch.pipeline().addLast(new StringEncoder(CharsetUtil.UTF_8)) ;
-                            ch.pipeline().addLast(new StringDecoder(CharsetUtil.UTF_8)) ;
+                            ch.pipeline().addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(this.getClass().getClassLoader()))) ;
+                            ch.pipeline().addLast(new ObjectEncoder());
                             ch.pipeline().addLast(new EchoClientHandler()); // 追加责任链
                         }
                     });

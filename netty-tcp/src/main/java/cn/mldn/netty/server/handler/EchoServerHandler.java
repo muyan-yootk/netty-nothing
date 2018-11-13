@@ -2,6 +2,7 @@ package cn.mldn.netty.server.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import cn.mldn.vo.Member ;
 
 /**
  * 服务端处理通道.这里只是打印一下请求的内容，并不对请求进行任何的响应 DiscardServerHandler 继承自
@@ -17,10 +18,13 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        String inputStr = (String) msg ; // 2、得到用户发送的数据
-        System.err.println("｛服务器｝" + inputStr);
-        String echoContent = "【ECHO】" + inputStr + System.getProperty("line.separator") ; // 3、回应的消息内容
-        ctx.writeAndFlush(echoContent) ;
+        Member member = (Member) msg;	// 接收发送来的对象数据
+        System.out.println("【服务端接收Member对象】" + member);
+        Member echoMember = new Member() ;
+        echoMember.setName("【ECHO】" + member.getName());
+        echoMember.setAge(member.getAge() * 2);
+        echoMember.setSalary(member.getSalary() * 3);
+        ctx.writeAndFlush(echoMember) ;
     }
     /***
      * 这个方法会在发生异常时触发
