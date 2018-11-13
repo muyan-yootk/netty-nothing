@@ -52,7 +52,7 @@ public class EchoServer {
             // 设置服务器端的TCP相关配置属性
             // option()是提供给NioServerSocketChannel用来接收进来的连接。
             serverBootstrap = serverBootstrap.option(ChannelOption.SO_BACKLOG, 128);
-            serverBootstrap = serverBootstrap.option(ChannelOption.TCP_NODELAY, true);
+            // serverBootstrap = serverBootstrap.option(ChannelOption.TCP_NODELAY, true);
             // childOption()是提供给由父管道ServerChannel接收到的连接， 在这个例子中也是NioServerSocketChannel。
             serverBootstrap = serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
             // 绑定端口并启动去接收进来的连接
